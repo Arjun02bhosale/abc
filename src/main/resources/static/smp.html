@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Inventory - Supplier Management</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f6fa;
+            color: #333;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 20px 0;
+        }
+
+        .logo {
+            text-align: center;
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo h2 {
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            margin-top: 20px;
+        }
+
+        .nav-links li {
+            list-style: none;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .nav-links i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        main {
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title h1 {
+            font-size: 1.8rem;
+            color: var(--secondary-color);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Supplier Management */
+        .supplier-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            width: 300px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+
+        /* Supplier Table */
+        .supplier-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .supplier-table th, .supplier-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .supplier-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--secondary-color);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .supplier-table th:hover {
+            background-color: #e9ecef;
+        }
+
+        .sort-icon {
+            margin-left: 5px;
+            color: #adb5bd;
+        }
+
+        .supplier-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .product-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .product-tag {
+            background-color: #e9ecef;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .edit-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .delete-btn {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+
+        /* Add Supplier Form */
+        .supplier-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            display: none; /* Hidden by default */
+        }
+
+        .form-title {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--secondary-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-cancel {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background-color: #7f8c8d;
+        }
+
+        /* Product Selection */
+        .product-selection {
+            margin-top: 15px;
+        }
+
+        .product-checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .product-checkbox {
+            display: flex;
+            align-items: center;
+        }
+
+        .product-checkbox input {
+            margin-right: 5px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 400px;
+            max-width: 90%;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                display: none;
+            }
+
+            .supplier-actions {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+<div class="container">
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">
+            <h2><i class="fas fa-boxes"></i> Smart Inventory</h2>
+        </div>
+        <ul class="nav-links">
+            <li><a href="./index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="./pmp.html"><i class="fas fa-box-open"></i> Products</a></li>
+            <li><a href="./smp.html" class="active"><i class="fas fa-truck"></i> Suppliers</a></li>
+            <li><a href="./report.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <header>
+            <div class="page-title">
+                <h1>Supplier Management</h1>
+            </div>
+            <div class="user-info">
+                <span>Admin User</span>
+                <img src="https://ui-avatars.com/api/?name=Admin+User&background=3498db&color=fff" alt="User">
+            </div>
+        </header>
+
+        <!-- Supplier Actions -->
+        <div class="supplier-actions">
+            <input type="text" class="search-box" id="searchBox" placeholder="Search suppliers...">
+            <button class="btn btn-success" id="addSupplierBtn">
+                <i class="fas fa-plus"></i> Add Supplier
+            </button>
+        </div>
+
+        <!-- Add Supplier Form (Hidden by default) -->
+        <div class="supplier-form" id="supplierForm">
+            <h3 class="form-title" id="formTitle">Add New Supplier</h3>
+            <form id="newSupplierForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="supplierName">Supplier Name</label>
+                        <input type="text" id="supplierName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="supplierContact">Contact Person</label>
+                        <input type="text" id="supplierContact" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="supplierEmail">Email</label>
+                        <input type="email" id="supplierEmail" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="supplierPhone">Phone</label>
+                        <input type="tel" id="supplierPhone" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="supplierAddress">Address</label>
+                    <textarea id="supplierAddress" class="form-control" rows="2" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Associated Products</label>
+                    <div class="product-selection">
+                        <div class="product-checkboxes" id="productCheckboxes">
+                            <!-- Product checkboxes will be added dynamically -->
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-cancel" id="cancelSupplierBtn">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save Supplier</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Suppliers Table -->
+        <table class="supplier-table" id="suppliersTable">
+            <thead>
+            <tr>
+                <th data-sort="name">Name <i class="fas fa-sort sort-icon"></i></th>
+                <th data-sort="contact">Contact <i class="fas fa-sort sort-icon"></i></th>
+                <th data-sort="email">Email <i class="fas fa-sort sort-icon"></i></th>
+                <th data-sort="phone">Phone <i class="fas fa-sort sort-icon"></i></th>
+                <th>Products</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="suppliersTableBody">
+            <!-- Suppliers will be added dynamically -->
+            </tbody>
+        </table>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal" id="deleteModal">
+            <div class="modal-content">
+                <h3 class="modal-title">Confirm Deletion</h3>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this supplier? This action cannot be undone.</p>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-cancel" id="cancelDeleteBtn">Cancel</button>
+                    <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Sample data
+        const sampleProducts = [
+            { id: 1, name: "Wireless Headphones" },
+            { id: 2, name: "Smart Watch" },
+            { id: 3, name: "Cotton T-Shirt" },
+            { id: 4, name: "Desk Lamp" },
+            { id: 5, name: "Water Bottle" },
+            { id: 6, name: "Ballpoint Pens" },
+            { id: 7, name: "Facial Cleanser" }
+        ];
+
+        let suppliers = [
+            {
+                id: 1,
+                name: "Tech Gadgets Inc.",
+                contact: "John Smith",
+                email: "john@techgadgets.com",
+                phone: "(555) 123-4567",
+                address: "123 Tech Street, Silicon Valley, CA",
+                products: [1, 2]
+            },
+            {
+                id: 2,
+                name: "Fashion World Ltd.",
+                contact: "Sarah Johnson",
+                email: "sarah@fashionworld.com",
+                phone: "(555) 987-6543",
+                address: "456 Fashion Ave, New York, NY",
+                products: [3]
+            },
+            {
+                id: 3,
+                name: "Home Essentials Co.",
+                contact: "Mike Brown",
+                email: "mike@homeessentials.com",
+                phone: "(555) 456-7890",
+                address: "789 Home Lane, Chicago, IL",
+                products: [4, 5]
+            },
+            {
+                id: 4,
+                name: "Office Supplies Plus",
+                contact: "Lisa Davis",
+                email: "lisa@officesupplies.com",
+                phone: "(555) 789-0123",
+                address: "321 Office Blvd, Dallas, TX",
+                products: [6]
+            },
+            {
+                id: 5,
+                name: "Beauty Products LLC",
+                contact: "David Wilson",
+                email: "david@beautyproducts.com",
+                phone: "(555) 234-5678",
+                address: "654 Beauty Road, Los Angeles, CA",
+                products: [7]
+            }
+        ];
+
+        // DOM elements
+        const suppliersTableBody = document.getElementById('suppliersTableBody');
+        const searchBox = document.getElementById('searchBox');
+        const addSupplierBtn = document.getElementById('addSupplierBtn');
+        const supplierForm = document.getElementById('supplierForm');
+        const newSupplierForm = document.getElementById('newSupplierForm');
+        const cancelSupplierBtn = document.getElementById('cancelSupplierBtn');
+        const formTitle = document.getElementById('formTitle');
+        const productCheckboxes = document.getElementById('productCheckboxes');
+        const deleteModal = document.getElementById('deleteModal');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const sortHeaders = document.querySelectorAll('.supplier-table th[data-sort]');
+
+        // Variables for tracking state
+        let isEditing = false;
+        let currentSupplierId = null;
+        let supplierToDeleteId = null;
+        let currentSort = { column: 'name', direction: 'asc' };
+
+        // Initialize the page
+        renderProductCheckboxes();
+        renderSuppliers(suppliers);
+
+        // Event listeners
+        searchBox.addEventListener('input', filterSuppliers);
+        addSupplierBtn.addEventListener('click', showAddSupplierForm);
+        cancelSupplierBtn.addEventListener('click', hideSupplierForm);
+        newSupplierForm.addEventListener('submit', handleSupplierSubmit);
+        cancelDeleteBtn.addEventListener('click', hideDeleteModal);
+        confirmDeleteBtn.addEventListener('click', confirmDeleteSupplier);
+
+        // Add sort event listeners to headers
+        sortHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const column = header.getAttribute('data-sort');
+                sortSuppliers(column);
+            });
+        });
+
+        // Functions
+        function renderSuppliers(suppliersToRender) {
+            suppliersTableBody.innerHTML = '';
+
+            if (suppliersToRender.length === 0) {
+                suppliersTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No suppliers found</td></tr>';
+                return;
+            }
+
+            suppliersToRender.forEach(supplier => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                        <td>${supplier.name}</td>
+                        <td>${supplier.contact}</td>
+                        <td>${supplier.email}</td>
+                        <td>${supplier.phone}</td>
+                        <td>
+                            <div class="product-tags">
+                                ${getProductTags(supplier.products)}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn edit-btn" data-id="${supplier.id}">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="action-btn delete-btn" data-id="${supplier.id}">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                suppliersTableBody.appendChild(row);
+            });
+
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', handleEditSupplier);
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', handleDeleteSupplier);
+            });
+
+            // Update sort icons
+            updateSortIcons();
+        }
+
+        function getProductTags(productIds) {
+            return productIds.map(id => {
+                const product = sampleProducts.find(p => p.id === id);
+                return product ? `<span class="product-tag">${product.name}</span>` : '';
+            }).join('');
+        }
+
+        function renderProductCheckboxes() {
+            productCheckboxes.innerHTML = sampleProducts.map(product => `
+                    <div class="product-checkbox">
+                        <input type="checkbox" id="product-${product.id}" value="${product.id}">
+                        <label for="product-${product.id}">${product.name}</label>
+                    </div>
+                `).join('');
+        }
+
+        function filterSuppliers() {
+            const searchTerm = searchBox.value.toLowerCase();
+
+            const filteredSuppliers = suppliers.filter(supplier => {
+                return supplier.name.toLowerCase().includes(searchTerm) ||
+                    supplier.contact.toLowerCase().includes(searchTerm) ||
+                    supplier.email.toLowerCase().includes(searchTerm) ||
+                    supplier.phone.toLowerCase().includes(searchTerm) ||
+                    supplier.address.toLowerCase().includes(searchTerm);
+            });
+
+            renderSuppliers(filteredSuppliers);
+        }
+
+        function sortSuppliers(column) {
+            // If clicking the same column, toggle direction
+            if (currentSort.column === column) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                // New column, default to ascending
+                currentSort = { column, direction: 'asc' };
+            }
+
+            suppliers.sort((a, b) => {
+                // Handle different data types
+                let valueA = a[column];
+                let valueB = b[column];
+
+                // For case-insensitive string comparison
+                if (typeof valueA === 'string') valueA = valueA.toLowerCase();
+                if (typeof valueB === 'string') valueB = valueB.toLowerCase();
+
+                if (valueA < valueB) {
+                    return currentSort.direction === 'asc' ? -1 : 1;
+                }
+                if (valueA > valueB) {
+                    return currentSort.direction === 'asc' ? 1 : -1;
+                }
+                return 0;
+            });
+
+            renderSuppliers(suppliers);
+        }
+
+        function updateSortIcons() {
+            sortHeaders.forEach(header => {
+                const icon = header.querySelector('.sort-icon');
+                const column = header.getAttribute('data-sort');
+
+                if (column === currentSort.column) {
+                    icon.className = currentSort.direction === 'asc'
+                        ? 'fas fa-sort-up sort-icon'
+                        : 'fas fa-sort-down sort-icon';
+                } else {
+                    icon.className = 'fas fa-sort sort-icon';
+                }
+            });
+        }
+
+        function showAddSupplierForm() {
+            isEditing = false;
+            currentSupplierId = null;
+            formTitle.textContent = 'Add New Supplier';
+            newSupplierForm.reset();
+
+            // Uncheck all product checkboxes
+            document.querySelectorAll('.product-checkbox input').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+
+            supplierForm.style.display = 'block';
+            document.getElementById('supplierName').focus();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function hideSupplierForm() {
+            supplierForm.style.display = 'none';
+        }
+
+        function handleEditSupplier(e) {
+            const supplierId = parseInt(e.currentTarget.getAttribute('data-id'));
+            const supplier = suppliers.find(s => s.id === supplierId);
+
+            if (supplier) {
+                isEditing = true;
+                currentSupplierId = supplierId;
+                formTitle.textContent = 'Edit Supplier';
+
+                // Fill the form with supplier data
+                document.getElementById('supplierName').value = supplier.name;
+                document.getElementById('supplierContact').value = supplier.contact;
+                document.getElementById('supplierEmail').value = supplier.email;
+                document.getElementById('supplierPhone').value = supplier.phone;
+                document.getElementById('supplierAddress').value = supplier.address;
+
+                // Check the associated products
+                document.querySelectorAll('.product-checkbox input').forEach(checkbox => {
+                    checkbox.checked = supplier.products.includes(parseInt(checkbox.value));
+                });
+
+                // Show the form
+                supplierForm.style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function handleSupplierSubmit(e) {
+            e.preventDefault();
+
+            // Get form values
+            const name = document.getElementById('supplierName').value;
+            const contact = document.getElementById('supplierContact').value;
+            const email = document.getElementById('supplierEmail').value;
+            const phone = document.getElementById('supplierPhone').value;
+            const address = document.getElementById('supplierAddress').value;
+
+            // Get selected products
+            const selectedProducts = [];
+            document.querySelectorAll('.product-checkbox input:checked').forEach(checkbox => {
+                selectedProducts.push(parseInt(checkbox.value));
+            });
+
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address');
+                return;
+            }
+
+            if (isEditing) {
+                // Update existing supplier
+                const supplierIndex = suppliers.findIndex(s => s.id === currentSupplierId);
+                if (supplierIndex !== -1) {
+                    suppliers[supplierIndex] = {
+                        ...suppliers[supplierIndex],
+                        name,
+                        contact,
+                        email,
+                        phone,
+                        address,
+                        products: selectedProducts
+                    };
+                }
+            } else {
+                // Add new supplier
+                const newId = suppliers.length > 0 ? Math.max(...suppliers.map(s => s.id)) + 1 : 1;
+                suppliers.push({
+                    id: newId,
+                    name,
+                    contact,
+                    email,
+                    phone,
+                    address,
+                    products: selectedProducts
+                });
+            }
+
+            // Refresh the table and hide the form
+            renderSuppliers(suppliers);
+            hideSupplierForm();
+
+            // Show success message
+            alert(`Supplier ${isEditing ? 'updated' : 'added'} successfully!`);
+        }
+
+        function handleDeleteSupplier(e) {
+            supplierToDeleteId = parseInt(e.currentTarget.getAttribute('data-id'));
+            showDeleteModal();
+        }
+
+        function showDeleteModal() {
+            deleteModal.style.display = 'flex';
+        }
+
+        function hideDeleteModal() {
+            deleteModal.style.display = 'none';
+            supplierToDeleteId = null;
+        }
+
+        function confirmDeleteSupplier() {
+            suppliers = suppliers.filter(s => s.id !== supplierToDeleteId);
+            renderSuppliers(suppliers);
+            hideDeleteModal();
+            alert('Supplier deleted successfully!');
+        }
+    });
+</script>
+</body>
+</html>
